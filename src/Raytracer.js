@@ -181,6 +181,14 @@ const Raytracer = () => {
       case 38:
         setRadius(radius + 5)
         break
+      case 33:
+        setRadius(radius + 25)
+        break
+      case 34:
+        if (radius > 25) {
+          setRadius(radius - 25)
+        }
+        break
       case 68:
         setDrawWalls({ mode: !drawWalls.mode, firstClick: true, start: null })
         break
