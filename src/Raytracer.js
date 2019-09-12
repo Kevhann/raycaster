@@ -14,6 +14,8 @@ const Raytracer = () => {
   const [rays, setRays] = useState(19)
   const [radius, setRadius] = useState(200)
   const [walls, setWalls] = useState(house)
+  const [spinning, setSpinning] = useState(true)
+  const [spinningValue, setSpinningValue] = useState(0)
   const [drawWalls, setDrawWalls] = useState({
     mode: false,
     firstClick: true,
@@ -23,6 +25,11 @@ const Raytracer = () => {
   const mouseOffsetX = -9
   const mouseOffsetY = -11
 
+  let ctx
+  let width = window.innerWidth
+  let height = window.innerHeight
+  const angle = (Math.PI / rays) * 2
+
   useEffect(() => {
     window.addEventListener("keydown", keyDownHandler, true)
     return () => {
@@ -31,14 +38,12 @@ const Raytracer = () => {
   })
 
   useInterval(() => {
-    draw()
+    if (spinning) {
+      setSpinningValue((spinningValue + 0.01) % Math.PI)
+
+      draw()
+    }
   }, 1000 / 60)
-
-  let ctx
-  let width = window.innerWidth
-  let height = window.innerHeight
-
-  let angle = (Math.PI / rays) * 2
 
   const draw = () => {
     ctx = ref.current.getContext("2d")
@@ -67,8 +72,8 @@ const Raytracer = () => {
 
   const drawRays = () => {
     for (let i = 0; i < rays; i++) {
-      let x = Math.sin(angle * i) * radius + xmouse
-      let y = Math.cos(angle * i) * radius + ymouse
+      let x = Math.sin(angle * i + spinningValue) * radius + xmouse
+      let y = Math.cos(angle * i + spinningValue) * radius + ymouse
       ctx.moveTo(xmouse, ymouse)
 
       let results = []
@@ -134,6 +139,9 @@ const Raytracer = () => {
   const handloMouseMove = event => {
     setXmouse(event.clientX + mouseOffsetX)
     setYmouse(event.clientY + mouseOffsetY)
+    if (!spinning) {
+      draw()
+    }
   }
 
   const handleMouseDown = event => {
@@ -157,6 +165,9 @@ const Raytracer = () => {
         )
         setDrawWalls({ ...drawWalls, firstClick: true, start: null })
       }
+    }
+    if (!spinning) {
+      draw()
     }
   }
 
@@ -182,11 +193,11 @@ const Raytracer = () => {
         setRadius(radius + 5)
         break
       case 33:
-        setRadius(radius + 25)
+        setRays(rays + 25)
         break
       case 34:
-        if (radius > 25) {
-          setRadius(radius - 25)
+        if (rays > 25) {
+          setRays(rays - 25)
         }
         break
       case 68:
@@ -198,22 +209,29 @@ const Raytracer = () => {
       case 72:
         setWalls(house)
         break
+      case 83:
+        setSpinning(!spinning)
+        break
       default:
+    }
+    if (!spinning) {
+      draw()
     }
   }
 
   return (
     <div>
-      <div style={{ position: "absolute" }}>
+      <div style={{ position: "absolute", backgroundColor: "white" }}>
         <div>
           x: {xmouse} | y: {ymouse}
         </div>
         <div>
           Rays: {rays} | radius: {radius}
         </div>
-        <div>Use the arrow keys to change the radius and number of rays</div>
+        <div>Arrow keys change the radius and number of rays</div>
         <div>Press D to toggle between rays and building new walls</div>
         <div>press C to clear walls and H to build the house</div>
+        <div>press s to toggle spinning</div>
       </div>
 
       <div id="canvas">
