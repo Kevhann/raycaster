@@ -2,17 +2,18 @@ import React, { useRef, useState, useEffect } from "react"
 import useInterval from "./useInterval"
 
 const Raytracer = () => {
-  const [xmouse, setXmouse] = useState()
-  const [ymouse, setYmouse] = useState()
-  const [rays, setRays] = useState(19)
-  const [radius, setRadius] = useState(200)
-  const [walls, setWalls] = useState([
+  const house = [
     { x1: 300, y1: 200, x2: 400, y2: 300 },
     { x1: 200, y1: 300, x2: 300, y2: 200 },
     { x1: 220, y1: 280, x2: 220, y2: 400 },
     { x1: 380, y1: 280, x2: 380, y2: 400 },
     { x1: 220, y1: 400, x2: 380, y2: 400 }
-  ])
+  ]
+  const [xmouse, setXmouse] = useState()
+  const [ymouse, setYmouse] = useState()
+  const [rays, setRays] = useState(19)
+  const [radius, setRadius] = useState(200)
+  const [walls, setWalls] = useState(house)
   const [drawWalls, setDrawWalls] = useState({
     mode: false,
     firstClick: true,
@@ -23,14 +24,9 @@ const Raytracer = () => {
   const mouseOffsetY = -11
 
   useEffect(() => {
-    // let canvas = document.getElementById("canvas")
-    // console.log("canvas:", canvas)
-    // canvas.addEventListener("keydown", keyDownHandler)
     window.addEventListener("keydown", keyDownHandler, true)
-
     return () => {
       window.removeEventListener("keydown", keyDownHandler, true)
-      // canvas.removeEventListener("keydown", keyDownHandler)
     }
   })
 
@@ -106,7 +102,6 @@ const Raytracer = () => {
         shortestIndex = i
       }
     }
-
     return shortestIndex
   }
 
@@ -171,12 +166,12 @@ const Raytracer = () => {
 
     switch (keyCode) {
       case 37:
-        if (rays > 5) {
-          setRays(rays - 5)
+        if (rays > 1) {
+          setRays(rays - 1)
         }
         break
       case 39:
-        setRays(rays + 5)
+        setRays(rays + 1)
         break
       case 40:
         if (radius > 5) {
@@ -191,6 +186,9 @@ const Raytracer = () => {
         break
       case 67:
         setWalls([])
+        break
+      case 72:
+        setWalls(house)
         break
       default:
     }
@@ -207,7 +205,7 @@ const Raytracer = () => {
         </div>
         <div>Use the arrow keys to change the radius and number of rays</div>
         <div>Press D to toggle between rays and building new walls</div>
-        <div>press C to clear walls</div>
+        <div>press C to clear walls and H to build the house</div>
       </div>
 
       <div id="canvas">
